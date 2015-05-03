@@ -12,19 +12,19 @@ public class Mdp implements Serializable{
 	private static int nb = 0;
 	
 	public Mdp(String n,String log, String m){
-		if(log==null || log.length()<2) throw new IllegalArgumentException("Login incorrecte");
-		if(m==null || m.length()<2) throw new IllegalArgumentException("Mot de passe incorrecte");
+		if(log==null) throw new IllegalArgumentException("Login incorrecte");
+		if(m==null) throw new IllegalArgumentException("Mot de passe incorrecte");
 		if(n==null) throw new IllegalArgumentException("Nom incorrecte");
 		
 		this.nom = n;
 		this.login = log;
 		this.mdp = m;
-		id = nb++;
+		id = ++nb;
 	}
 	
 	public void edit(String newname, String newlog, String newm){
-		if(newlog==null || newlog.length()<2) throw new IllegalArgumentException("Nouveau login incorrecte");
-		if(newm==null || newm.length()<2) throw new IllegalArgumentException("Nouveau mot de passe incorrecte");
+		if(newlog==null) throw new IllegalArgumentException("Nouveau login incorrecte");
+		if(newm==null) throw new IllegalArgumentException("Nouveau mot de passe incorrecte");
 		if(newname==null) throw new IllegalArgumentException("Nom incorrecte");
 		
 		this.nom = newname;
@@ -34,17 +34,12 @@ public class Mdp implements Serializable{
 	
 	
 	public String toString(){
-		String ret = "";
-		ret = nom;
-		return ret;
+		return nom;
 	}
 	
 	public String display(){
-		String ret = "";
-		ret = nom+" "+login + " "+mdp+" "+id+"\n";
-		return ret;
+		return nom+" "+login+ " "+mdp+" "+id+"\n";
 	}
-
 	
 	
 	public String getNom() {

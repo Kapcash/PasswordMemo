@@ -14,15 +14,18 @@ import motdepasse.view.MdpView;
 public class MdpData {
 	
 	private static MdpData instance;
-	private final String savePath = "C:/Users/Florent/Documents/Logiciels/MotDePasse/Mdp.out";
+	private final String savePath = "./Mdp.out";
 	private ArrayList<Mdp> list;
 	private MdpView view;
+	boolean inAdd,inEdit;
 	
 	private MdpData(MdpView v){
 		if(!this.load()){
 			list = new ArrayList<Mdp>();
 		}
 		view = v;
+		inAdd=false;
+		inEdit=false;
 	}
 	
 	public static MdpData getInstance(MdpView v){
@@ -37,14 +40,15 @@ public class MdpData {
 		list.add(newMdp);
 		this.trierList();
 		this.save();
-		view.addJList(newMdp);
+		int index = this.getList().indexOf(newMdp);
+		view.getListModel().add(index,newMdp);
 	}
 	
 	public void removeMdp(String name){
 		Mdp removed = this.findByName(name);
 		list.remove(removed);
 		this.save();
-		view.removeJList(removed);
+		view.getListModel().removeElement(removed);
 	}
 	
 	public void editMdp(String name, String newname, String newlog, String newmdp){
@@ -55,7 +59,7 @@ public class MdpData {
 	}
 	
 	
-	private Mdp findByName(String name){
+	public Mdp findByName(String name){
 		Mdp ret=null;
 		if(this.alreadyExist(name)){
 			for(int i=0;i<list.size();i++){
@@ -121,7 +125,26 @@ public class MdpData {
 		System.out.println(ret);
 	}
 	
+	
+	// --- Getters & Setters --- //
+	
 	public ArrayList<Mdp> getList() {
 		return list;
+	}
+
+	public boolean isInAdd() {
+		return inAdd;
+	}
+
+	public void setInAdd(boolean inAdd) {
+		this.inAdd = inAdd;
+	}
+
+	public boolean isInEdit() {
+		return inEdit;
+	}
+
+	public void setInEdit(boolean inEdit) {
+		this.inEdit = inEdit;
 	}
 }
