@@ -72,6 +72,7 @@ public class MdpView extends JFrame {
 		this.setIconImage(new ImageIcon("./Icon_mdp.png").getImage());
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
+		pwdField.requestFocusInWindow();
 	}
 
 	public void init(){
@@ -291,6 +292,7 @@ public class MdpView extends JFrame {
 		loginField.addKeyListener(listener);
 		mdpField.addKeyListener(listener);
 		searchField.getDocument().addDocumentListener(listener);
+		searchField.addKeyListener(listener);
 		listmdp.addKeyListener(listener);
 
 		pwdField.addKeyListener(listener);

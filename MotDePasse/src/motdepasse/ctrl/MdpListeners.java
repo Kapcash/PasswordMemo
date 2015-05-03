@@ -178,6 +178,10 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 		else if(e.getSource() == view.getListmdp() && e.getKeyCode() == KeyEvent.VK_DELETE){
 			this.removeAction();
 		}
+		else if(e.getSource() == view.getSearchField() && e.getKeyCode() == KeyEvent.VK_DOWN){
+			view.getListmdp().requestFocusInWindow();
+			view.getListmdp().setSelectedIndex(0);
+		}
 	}
 
 	public void keyReleased(KeyEvent e) {;}
