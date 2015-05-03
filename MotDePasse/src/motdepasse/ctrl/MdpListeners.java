@@ -1,5 +1,6 @@
 package motdepasse.ctrl;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
@@ -32,6 +33,7 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 	private JButton ok,cancel;
 	private String beforeEdit;
 	private JPanel rightP;
+	private boolean inPwd;
 
 	public MdpListeners(MdpView v, MdpData d){
 		this.view = v;
@@ -43,9 +45,21 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 		ok = view.getOkButton();
 		cancel = view.getCancelButton();
 		rightP = view.getRightPanel();
+		inPwd = true;
 	}
 
-	public void mouseClicked(MouseEvent e) {;}
+	public void mouseClicked(MouseEvent e) {
+		Object src = e.getSource();
+		if(src == view.getOkButton()){
+			okAction();
+		}
+		else if(src == view.getCancelButton()){
+			cancelAction();
+		}
+		else if(src == view.getOkPwdButton()){
+			passwordAction();
+		}
+	}
 
 	public void mousePressed(MouseEvent e) {
 		Object src = e.getSource();
@@ -97,12 +111,6 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 			icon = new ImageIcon(newimg);
 			view.getEditButton().setIcon(icon);
 			editAction();
-		}
-		else if(src == view.getOkButton()){
-			okAction();
-		}
-		else if(src == view.getCancelButton()){
-			cancelAction();
 		}
 	}
 
@@ -163,7 +171,11 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 			ok.doClick();
 			okAction();
 		}
-		if(e.getSource() == view.getListmdp() && e.getKeyCode() == KeyEvent.VK_DELETE){
+		else if(e.getKeyCode() == KeyEvent.VK_ENTER && inPwd){
+			view.getOkPwdButton().doClick();
+			this.passwordAction();
+		}
+		else if(e.getSource() == view.getListmdp() && e.getKeyCode() == KeyEvent.VK_DELETE){
 			this.removeAction();
 		}
 	}
@@ -254,7 +266,31 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 		rightP.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),"Informations",0,0,new Font("Arial", 0, 15)));
 		emptyFields();
 	}
-
+	
+	private void passwordAction(){
+		char[] pwd = view.getPwdField().getPassword();
+		String password = new String(pwd);
+		if(password.equals("110895")){
+			view.getPwdLabel().setText("Authentification réussie");
+			view.initData();
+			inPwd = false;
+		}
+		else{
+			new Thread(){
+				@Override
+				public void run(){
+					try {
+						view.getPwdLabel().setText("Mot de passe incorrecte !");
+						view.getPwdLabel().setForeground(Color.red);
+						Thread.sleep(5000);
+						view.getPwdLabel().setText(" ");
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}.start();
+		}
+	}
 
 	private void research(){
 		String s = search.getText();
