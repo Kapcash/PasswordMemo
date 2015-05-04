@@ -33,7 +33,6 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 	private JButton ok,cancel;
 	private String beforeEdit;
 	private JPanel rightP;
-	private boolean inPwd;
 
 	public MdpListeners(MdpView v, MdpData d){
 		this.view = v;
@@ -45,7 +44,6 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 		ok = view.getOkButton();
 		cancel = view.getCancelButton();
 		rightP = view.getRightPanel();
-		inPwd = true;
 	}
 
 	public void mouseClicked(MouseEvent e) {
@@ -58,6 +56,9 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 		}
 		else if(src == view.getOkPwdButton()){
 			passwordAction();
+		}
+		else if(src == view.getOkinitButton()){
+			initAction();
 		}
 	}
 
@@ -167,13 +168,18 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 	public void keyTyped(KeyEvent e) {;}
 
 	public void keyPressed(KeyEvent e) {
+		Object src = e.getSource();
 		if(e.getKeyCode() == KeyEvent.VK_ENTER && ok.isEnabled()){
 			ok.doClick();
 			okAction();
 		}
-		else if(e.getKeyCode() == KeyEvent.VK_ENTER && inPwd){
+		else if(src==view.getPwdField() && e.getKeyCode() == KeyEvent.VK_ENTER){
 			view.getOkPwdButton().doClick();
 			this.passwordAction();
+		}
+		else if((src==view.getInitField1() || src==view.getInitField2()) && e.getKeyCode() == KeyEvent.VK_ENTER){
+			view.getOkinitButton().doClick();
+			this.initAction();
 		}
 		else if(e.getSource() == view.getListmdp() && e.getKeyCode() == KeyEvent.VK_DELETE){
 			this.removeAction();
@@ -214,6 +220,7 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 		}
 	}
 
+	// ----- ACTIONS ----- //
 
 	private void addAction(){
 		name.setText("Nom");
@@ -265,7 +272,6 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 		view.getSearchField().setText("");
 	}
 
-
 	private void cancelAction(){
 		rightP.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED),"Informations",0,0,new Font("Arial", 0, 15)));
 		emptyFields();
@@ -274,18 +280,16 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 	private void passwordAction(){
 		char[] pwd = view.getPwdField().getPassword();
 		String password = new String(pwd);
-		if(password.equals("110895")){
-			view.getPwdLabel().setText("Authentification réussie");
+		if(password.equals(data.getMdp())){
 			view.initData();
-			inPwd = false;
 		}
 		else{
 			new Thread(){
 				@Override
 				public void run(){
 					try {
-						view.getPwdLabel().setText("Mot de passe incorrecte !");
 						view.getPwdLabel().setForeground(Color.red);
+						view.getPwdLabel().setText("Mot de passe incorrecte !");
 						Thread.sleep(5000);
 						view.getPwdLabel().setText(" ");
 					} catch (InterruptedException e) {
@@ -295,7 +299,33 @@ public class MdpListeners implements DocumentListener, MouseListener, KeyListene
 			}.start();
 		}
 	}
-
+	
+	private void initAction(){
+		char[] pwd1 = view.getInitField1().getPassword();
+		char[] pwd2 = view.getInitField2().getPassword();
+		String password1 = new String(pwd1);
+		String password2 = new String(pwd2);
+		if(password1.equals(password2)){
+			data.setMdp(password1);
+			view.initData();
+		}
+		else{
+			new Thread(){
+				@Override
+				public void run(){
+					try {
+						view.getInitLabel().setForeground(Color.red);
+						view.getInitLabel().setText("Les champs doivent être identiques !");
+						Thread.sleep(5000);
+						view.getInitLabel().setText(" ");
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}.start();
+		}
+	}
+	
 	private void research(){
 		String s = search.getText();
 		ArrayList<Mdp> list = data.getList();

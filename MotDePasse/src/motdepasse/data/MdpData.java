@@ -1,7 +1,10 @@
 package motdepasse.data;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -17,7 +20,8 @@ public class MdpData {
 	private final String savePath = "./Mdp.out";
 	private ArrayList<Mdp> list;
 	private MdpView view;
-	boolean inAdd,inEdit;
+	private boolean inAdd,inEdit;
+	private final File CONFIG = new File("./passwordmemo.config");
 	
 	private MdpData(MdpView v){
 		if(!this.load()){
@@ -110,11 +114,42 @@ public class MdpData {
 			flux.close();
 		}
 		catch(Exception e){
-			//e.printStackTrace();
+			e.printStackTrace();
 			ret = false;
 		}
 		list = mdpOut;
 		return ret;
+	}
+	
+	public void setMdp(String mdp){
+		if (mdp.equals("")) throw new IllegalArgumentException("Le mot de passe de l'application ne peut être vide !");
+		ObjectOutputStream flux;
+		try {
+			flux = new ObjectOutputStream(new FileOutputStream(CONFIG));
+			flux.writeObject(mdp);
+			flux.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public String getMdp(){
+		String ret = null;
+		try{
+			ObjectInputStream flux = new ObjectInputStream(new FileInputStream(CONFIG));
+			ret = (String) flux.readObject();
+			flux.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
+	public boolean isFirstLaunch(){
+		return !CONFIG.exists();
 	}
 	
 	public void displayList(){
